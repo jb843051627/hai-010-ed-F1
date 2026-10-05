@@ -42,10 +42,16 @@ CREATE TABLE IF NOT EXISTS t_ed_archive_card (
 CREATE TABLE IF NOT EXISTS t_ed_course_task (
   id bigint NOT NULL COMMENT '主键',
   item_no varchar(64) DEFAULT NULL COMMENT '选课催办事项号',
-  due_at datetime DEFAULT NULL COMMENT '选课截止那一天最后一刻',
-  amount decimal(12,2) DEFAULT NULL COMMENT '单条提前催办的自然日数',
+  due_at datetime DEFAULT NULL COMMENT '选课截止那一天最后一刻（定后不许改）',
+  amount decimal(12,2) DEFAULT NULL COMMENT '单条提前催办的自然日数（唯一可调的口径）',
   content varchar(255) DEFAULT NULL COMMENT '催办事由与受派辅导员记要',
-  status int DEFAULT NULL COMMENT '条目情形 0待派 1已派 2派不出去',
+  status int DEFAULT NULL COMMENT '条目情形 0待派 1已派 2已撤单 3已挂起',
+  student_id bigint DEFAULT NULL COMMENT '关联学生底档 t_ed_student.id（浮出前查在籍）',
+  assignee varchar(64) DEFAULT NULL COMMENT '受派辅导员工号 t_ed_counselor.counselor_no',
+  dispatched_at datetime DEFAULT NULL COMMENT '真派出的时刻（写一次，不许覆盖）',
+  window_code varchar(16) DEFAULT NULL COMMENT '派出所在档 DAY白天档 PEAK高峰档',
+  round_id varchar(40) DEFAULT NULL COMMENT '派出那一轮的轮次号（档位-时刻）',
+  stop_reason varchar(255) DEFAULT NULL COMMENT '挂起或撤单的原由（留痕）',
   del_flag int DEFAULT '0' COMMENT '删除标记 0正常 1删除',
   create_by varchar(64) DEFAULT NULL COMMENT '创建者',
   create_time datetime DEFAULT NULL COMMENT '创建时间',
@@ -54,6 +60,21 @@ CREATE TABLE IF NOT EXISTS t_ed_course_task (
   remark varchar(500) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='选课催办事项条';
+
+CREATE TABLE IF NOT EXISTS t_ed_counselor (
+  id bigint NOT NULL COMMENT '主键',
+  counselor_no varchar(64) DEFAULT NULL COMMENT '辅导员工号',
+  counselor_name varchar(64) DEFAULT NULL COMMENT '辅导员姓名',
+  group_no varchar(64) DEFAULT NULL COMMENT '所属辅导组',
+  status int DEFAULT NULL COMMENT '在岗情形 0在岗 1整组调走',
+  del_flag int DEFAULT '0' COMMENT '删除标记 0正常 1删除',
+  create_by varchar(64) DEFAULT NULL COMMENT '创建者',
+  create_time datetime DEFAULT NULL COMMENT '创建时间',
+  update_by varchar(64) DEFAULT NULL COMMENT '更新者',
+  update_time datetime DEFAULT NULL COMMENT '更新时间',
+  remark varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='辅导员名册';
 
 CREATE TABLE IF NOT EXISTS t_ed_grade_rule (
   id bigint NOT NULL COMMENT '主键',
@@ -132,4 +153,11 @@ CREATE TABLE IF NOT EXISTS t_ed_student (
 INSERT IGNORE INTO t_ed_student (id, site_no, site_name, site_type, road_name, th1_max, th2_max, th3_max, status, del_flag, create_by, create_time)
 VALUES (0, 'ST00', '临江市东湖街本科培养组（在籍）', '本科', '临江省—临江市—东湖区—东湖街道', 30.00, 60.00, 120.00, 0, 0, 'seed', NOW()),
        (1, 'ST01', '临江市城南研究生培养组（已注销）', '研究生', '临江省—临江市—城南区—望湖街道', 30.00, 60.00, 120.00, 1, 0, 'seed', NOW());
+
+-- 初始辅导员名册：id=0..2 在岗、id=3 整组调走（派单只在在岗里派）
+INSERT IGNORE INTO t_ed_counselor (id, counselor_no, counselor_name, group_no, status, del_flag, create_by, create_time)
+VALUES (0, 'CS00', '陈启', 'G1', 0, 0, 'seed', NOW()),
+       (1, 'CS01', '林岚', 'G1', 0, 0, 'seed', NOW()),
+       (2, 'CS02', '赵蔚', 'G2', 0, 0, 'seed', NOW()),
+       (3, 'CS03', '周航', 'G3', 1, 0, 'seed', NOW());
 

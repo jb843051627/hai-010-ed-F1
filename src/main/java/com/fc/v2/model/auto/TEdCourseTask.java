@@ -37,15 +37,15 @@ public class TEdCourseTask implements Serializable {
     @ApiModelProperty(value = "选课催办事项号")
     private String itemNo;
 
-    /** 选课截止那一天最后一刻 */
+    /** 选课截止那一天最后一刻（定后不许改） */
     @TableField("due_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @ApiModelProperty(value = "选课截止那一天最后一刻")
+    @ApiModelProperty(value = "选课截止那一天最后一刻（定后不许改）")
     private Date dueAt;
 
-    /** 单条提前催办的自然日数 */
+    /** 单条提前催办的自然日数（唯一可调的口径） */
     @TableField("amount")
-    @ApiModelProperty(value = "单条提前催办的自然日数")
+    @ApiModelProperty(value = "单条提前催办的自然日数（唯一可调的口径）")
     private BigDecimal amount;
 
     /** 催办事由与受派辅导员记要 */
@@ -53,10 +53,41 @@ public class TEdCourseTask implements Serializable {
     @ApiModelProperty(value = "催办事由与受派辅导员记要")
     private String content;
 
-    /** 条目情形 0待派 1已派 2派不出去 */
+    /** 条目情形 0待派 1已派 2已撤单 3已挂起 */
     @TableField("status")
-    @ApiModelProperty(value = "条目情形 0待派 1已派 2派不出去")
+    @ApiModelProperty(value = "条目情形 0待派 1已派 2已撤单 3已挂起")
     private Integer status;
+
+    /** 关联学生底档 t_ed_student.id（浮出前查在籍） */
+    @TableField("student_id")
+    @ApiModelProperty(value = "关联学生底档 t_ed_student.id（浮出前查在籍）")
+    private Long studentId;
+
+    /** 受派辅导员工号 t_ed_counselor.counselor_no */
+    @TableField("assignee")
+    @ApiModelProperty(value = "受派辅导员工号 t_ed_counselor.counselor_no")
+    private String assignee;
+
+    /** 真派出的时刻（写一次，不许覆盖） */
+    @TableField("dispatched_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "真派出的时刻（写一次，不许覆盖）")
+    private Date dispatchedAt;
+
+    /** 派出所在档 DAY白天档 PEAK高峰档 */
+    @TableField("window_code")
+    @ApiModelProperty(value = "派出所在档 DAY白天档 PEAK高峰档")
+    private String windowCode;
+
+    /** 派出那一轮的轮次号（档位-时刻） */
+    @TableField("round_id")
+    @ApiModelProperty(value = "派出那一轮的轮次号（档位-时刻）")
+    private String roundId;
+
+    /** 挂起或撤单的原由（留痕） */
+    @TableField("stop_reason")
+    @ApiModelProperty(value = "挂起或撤单的原由（留痕）")
+    private String stopReason;
 
     /** 删除标记 0正常 1删除 */
     @TableField("del_flag")
@@ -136,6 +167,54 @@ public class TEdCourseTask implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public Date getDispatchedAt() {
+        return dispatchedAt;
+    }
+
+    public void setDispatchedAt(Date dispatchedAt) {
+        this.dispatchedAt = dispatchedAt;
+    }
+
+    public String getWindowCode() {
+        return windowCode;
+    }
+
+    public void setWindowCode(String windowCode) {
+        this.windowCode = windowCode;
+    }
+
+    public String getRoundId() {
+        return roundId;
+    }
+
+    public void setRoundId(String roundId) {
+        this.roundId = roundId;
+    }
+
+    public String getStopReason() {
+        return stopReason;
+    }
+
+    public void setStopReason(String stopReason) {
+        this.stopReason = stopReason;
     }
 
     public Integer getDelFlag() {
