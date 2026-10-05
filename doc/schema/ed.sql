@@ -42,18 +42,35 @@ CREATE TABLE IF NOT EXISTS t_ed_archive_card (
 CREATE TABLE IF NOT EXISTS t_ed_course_task (
   id bigint NOT NULL COMMENT '主键',
   item_no varchar(64) DEFAULT NULL COMMENT '选课催办事项号',
-  due_at datetime DEFAULT NULL COMMENT '选课截止那一天最后一刻',
-  amount decimal(12,2) DEFAULT NULL COMMENT '单条提前催办的自然日数',
+  due_at datetime DEFAULT NULL COMMENT '选课截止那一天最后一刻（立条时落笔，之后不许改）',
+  amount decimal(12,2) DEFAULT NULL COMMENT '单条提前催办的自然日数（唯一允许调整的口径）',
   content varchar(255) DEFAULT NULL COMMENT '催办事由与受派辅导员记要',
-  status int DEFAULT NULL COMMENT '条目情形 0待派 1已派 2派不出去',
+  counselor varchar(64) DEFAULT NULL COMMENT '受派辅导员（派单时落笔）',
+  dispatched_at datetime DEFAULT NULL COMMENT '真派出的时刻（落笔后不许覆盖）',
+  hold_reason varchar(255) DEFAULT NULL COMMENT '挂起或撤单原由',
+  status int DEFAULT NULL COMMENT '条目情形 0待派 1已派 2挂起(派不出去) 3已撤',
   del_flag int DEFAULT '0' COMMENT '删除标记 0正常 1删除',
   create_by varchar(64) DEFAULT NULL COMMENT '创建者',
   create_time datetime DEFAULT NULL COMMENT '创建时间',
   update_by varchar(64) DEFAULT NULL COMMENT '更新者',
   update_time datetime DEFAULT NULL COMMENT '更新时间',
   remark varchar(500) DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_course_task_item_no (item_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='选课催办事项条';
+
+CREATE TABLE IF NOT EXISTS t_ed_course_task_log (
+  id bigint NOT NULL COMMENT '主键',
+  task_id bigint NOT NULL COMMENT '催办事项id',
+  item_no varchar(64) DEFAULT NULL COMMENT '选课催办事项号（冗余，便于翻查）',
+  action varchar(16) DEFAULT NULL COMMENT '动作 DISPATCH派单 SUSPEND挂起 CANCEL撤单',
+  slot varchar(8) DEFAULT NULL COMMENT '派单档 DAY日常 PEAK高峰（仅派单动作有值）',
+  counselor varchar(64) DEFAULT NULL COMMENT '受派辅导员（仅派单动作有值）',
+  detail varchar(500) DEFAULT NULL COMMENT '原由与记要',
+  create_time datetime DEFAULT NULL COMMENT '落痕时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_course_task_log_task_action (task_id, action)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='选课催办派单留痕（派一次只留一条）';
 
 CREATE TABLE IF NOT EXISTS t_ed_grade_rule (
   id bigint NOT NULL COMMENT '主键',

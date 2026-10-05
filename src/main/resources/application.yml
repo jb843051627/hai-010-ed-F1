@@ -21,6 +21,23 @@ fuce:
   roll-verification: false
   # 文件路径 示例（ Windows配置D:/v2/uploadPath，Linux配置 /home/v2/uploadPath）
   profile: D:/v2/uploadPath
+#选课催办派单班次
+ed:
+  course-task:
+    #日常档：白天开窗，夜间不派
+    day-start: "08:00"
+    day-end: "20:00"
+    #高峰档：选课高峰那三天单开，不走日常档
+    peak-start: "08:00"
+    peak-end: "22:00"
+    #选课高峰日期（教务处划定的那三天），如 ["2026-09-14","2026-09-15","2026-09-16"]
+    peak-dates: []
+    #法定节假日，整段不派
+    holidays: []
+    #在册辅导员代号，按手头在催人数派单（在催越多权重越低，手头空的先接）
+    counselors: []
+    #浮出超过几天没催出去顶到派发最前头
+    aged-days: 3
 #tomcat config
 server :
   port : 8080

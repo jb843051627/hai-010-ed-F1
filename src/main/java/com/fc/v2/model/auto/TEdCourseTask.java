@@ -37,13 +37,13 @@ public class TEdCourseTask implements Serializable {
     @ApiModelProperty(value = "选课催办事项号")
     private String itemNo;
 
-    /** 选课截止那一天最后一刻 */
+    /** 选课截止那一天最后一刻（立条时落笔，之后不许改） */
     @TableField("due_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "选课截止那一天最后一刻")
     private Date dueAt;
 
-    /** 单条提前催办的自然日数 */
+    /** 单条提前催办的自然日数（唯一允许调整的口径） */
     @TableField("amount")
     @ApiModelProperty(value = "单条提前催办的自然日数")
     private BigDecimal amount;
@@ -53,9 +53,25 @@ public class TEdCourseTask implements Serializable {
     @ApiModelProperty(value = "催办事由与受派辅导员记要")
     private String content;
 
-    /** 条目情形 0待派 1已派 2派不出去 */
+    /** 受派辅导员（派单时落笔） */
+    @TableField("counselor")
+    @ApiModelProperty(value = "受派辅导员")
+    private String counselor;
+
+    /** 真派出的时刻（落笔后不许覆盖） */
+    @TableField("dispatched_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "真派出的时刻")
+    private Date dispatchedAt;
+
+    /** 挂起或撤单原由 */
+    @TableField("hold_reason")
+    @ApiModelProperty(value = "挂起或撤单原由")
+    private String holdReason;
+
+    /** 条目情形 0待派 1已派 2挂起(派不出去) 3已撤 */
     @TableField("status")
-    @ApiModelProperty(value = "条目情形 0待派 1已派 2派不出去")
+    @ApiModelProperty(value = "条目情形 0待派 1已派 2挂起 3已撤")
     private Integer status;
 
     /** 删除标记 0正常 1删除 */
@@ -128,6 +144,30 @@ public class TEdCourseTask implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getCounselor() {
+        return counselor;
+    }
+
+    public void setCounselor(String counselor) {
+        this.counselor = counselor;
+    }
+
+    public Date getDispatchedAt() {
+        return dispatchedAt;
+    }
+
+    public void setDispatchedAt(Date dispatchedAt) {
+        this.dispatchedAt = dispatchedAt;
+    }
+
+    public String getHoldReason() {
+        return holdReason;
+    }
+
+    public void setHoldReason(String holdReason) {
+        this.holdReason = holdReason;
     }
 
     public Integer getStatus() {
